@@ -3,18 +3,21 @@ from transformers import AutoProcessor, AutoModelForZeroShotObjectDetection
 from PIL import Image
 
 
-def load_grounding_dino(device: str):
+def load_grounding_dino():
     model_id = "IDEA-Research/grounding-dino-tiny"
 
     grounding_processor = AutoProcessor.from_pretrained(model_id)
-    grounding_model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id).to(device)
+    grounding_model = AutoModelForZeroShotObjectDetection.from_pretrained(model_id)
     return grounding_processor, grounding_model
 
 
 def run_grounding_dino(image: Image, dino_prompt: str, grounding_processor, grounding_model, device):
     dino_inputs = grounding_processor(images=image, text=dino_prompt, return_tensors="pt").to(device)
+    grounding_model = grounding_model.to(device)
     with torch.no_grad():
         raw_dino_outputs = grounding_model(**dino_inputs)
+    grounding_model = grounding_model.to("cpu")
+
     dino_result = grounding_processor.post_process_grounded_object_detection(
         raw_dino_outputs,
         dino_inputs.input_ids,

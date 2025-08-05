@@ -5,7 +5,7 @@ import numpy as np
 import random
 
 
-def load_sam(sam2_checkpoint: str, model_cfg: str, device: str):
+def load_sam():
     sam2_predictor = SAM2ImagePredictor.from_pretrained("facebook/sam2-hiera-large")
     return sam2_predictor
 
