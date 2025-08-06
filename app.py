@@ -1,4 +1,4 @@
-import gradio as gradio
+import gradio as gr
 from PIL import Image
 import torch
 import numpy as np
@@ -17,11 +17,10 @@ def load_models():
     return llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl
 
 
-def main(user_prompt: str, img_path: str):
+def main(user_prompt: str, image: Image):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl = load_models()
-    image = Image.open(img_path)
     original_size = image.size
     resized_img = image.resize((1024, 1024))
     dino_input, diffusion_input = parse_user_prompt(user_prompt, llm_chain)
@@ -38,7 +37,23 @@ def main(user_prompt: str, img_path: str):
     generator = torch.Generator("cuda").manual_seed(920)
     inpainted_img = inpaint(pipe_sd_xl, diffusion_input, resized_img, mask_img, generator, device)
     final_img = inpainted_img.resize(original_size)
-    return final_img
+    return final_img, mask_img.resize(original_size)
+
+
+if __name__ == "__main__":
+    iface = gr.Interface(
+        fn=main,
+        inputs=[
+            gr.Image(type="pil", label="Upload an Image"),
+            gr.Textbox(label="Object to Remove", placeholder="e.g., a car, a vase, a person")
+        ],
+        outputs=[
+            gr.Image(type="pil", label="Resulting Image"),
+            gr.Image(type="pil", label="Generated and Dilated Mask (for visualization)")
+        ],
+        title="Language Guided Fine-Grained Image Editing",
+        description="This demo automatically removes an object from an image based on a text prompt, without requiring a manual mask.",
+    )
 
 
 
