@@ -17,7 +17,7 @@ def load_models():
     return llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl
 
 
-def main(user_prompt: str, image: Image):
+def main(image: Image, user_prompt: str):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl = load_models()

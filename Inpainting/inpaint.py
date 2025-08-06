@@ -11,8 +11,8 @@ def load_diffusion():
     pipe_sd_xl = AutoPipelineForInpainting.from_pretrained(
         "diffusers/stable-diffusion-xl-1.0-inpainting-0.1",
         # Huggingface workspace don't have gpu
-        # torch_dtype=torch.float16,
-        # variant="fp16"
+        torch_dtype=torch.float16,
+        variant="fp16"
     )
     return pipe_sd_xl
 
