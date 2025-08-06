@@ -10,8 +10,9 @@ from PIL import Image
 def load_diffusion():
     pipe_sd_xl = AutoPipelineForInpainting.from_pretrained(
         "diffusers/stable-diffusion-xl-1.0-inpainting-0.1",
-        torch_dtype=torch.float16,
-        variant="fp16"
+        # Huggingface workspace don't have gpu
+        # torch_dtype=torch.float16,
+        # variant="fp16"
     )
     return pipe_sd_xl
 

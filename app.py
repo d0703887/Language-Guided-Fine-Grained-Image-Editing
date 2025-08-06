@@ -17,11 +17,16 @@ def load_models():
     return llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl
 
 
-def main(user_prompt: str, img_path: str, llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl, device: str):
+def main(user_prompt: str, img_path: str):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    llm_chain, grounding_processor, grounding_model, sam2_predictor, pipe_sd_xl = load_models()
     image = Image.open(img_path)
     original_size = image.size
     resized_img = image.resize((1024, 1024))
     dino_input, diffusion_input = parse_user_prompt(user_prompt, llm_chain)
+    if isinstance(dino_input[0], list):
+        dino_input = dino_input[0]
     grounded_boxes = run_grounding_dino(resized_img, dino_input, grounding_processor, grounding_model, device)
 
     resized_img_np = np.array(resized_img)
@@ -34,5 +39,7 @@ def main(user_prompt: str, img_path: str, llm_chain, grounding_processor, ground
     inpainted_img = inpaint(pipe_sd_xl, diffusion_input, resized_img, mask_img, generator, device)
     final_img = inpainted_img.resize(original_size)
     return final_img
+
+
 
 
