@@ -54,6 +54,7 @@ if __name__ == "__main__":
         title="Language Guided Fine-Grained Image Editing",
         description="This demo automatically removes an object from an image based on a text prompt, without requiring a manual mask.",
     )
+    iface.launch()
 
 
 
